@@ -4,21 +4,13 @@ const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data");
 beforeEach(() => seed(testData));
 
-// describe(('Invalid Route'), () =>{
-//   return request(app)
-//     .get("invalid api")
-//     .expect(404)
-//     .then(({ body }) => {
-//       expect(body).toEqual({ msg: "Not Found" });
-//     });
-// })
-
 describe("GET /api/categories", () => {
   it("should respond with an array of category objects", () => {
     return request(app)
       .get("/api/categories")
       .expect(200)
       .then((res) => {
+        expect(res.body.categories.length).not.toBe(0);
         res.body.categories.forEach((category) => {
           expect(category).toEqual(
             expect.objectContaining({
@@ -68,3 +60,5 @@ describe("GET /api/reviews/:review_id", () => {
       });
   });
 });
+
+describe("PATCH /api/reviews/:review_id", () => {});
