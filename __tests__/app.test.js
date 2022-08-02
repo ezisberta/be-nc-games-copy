@@ -4,15 +4,6 @@ const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data");
 beforeEach(() => seed(testData));
 
-// describe(('Invalid Route'), () =>{
-//   return request(app)
-//     .get("invalid api")
-//     .expect(404)
-//     .then(({ body }) => {
-//       expect(body).toEqual({ msg: "Not Found" });
-//     });
-// })
-
 describe("GET /api/categories", () => {
   it("should respond with an array of category objects", () => {
     return request(app)
@@ -95,6 +86,15 @@ describe("PATCH /api/reviews/:review_id", () => {
     return request(app)
       .patch("/api/reviews/3")
       .send({ vote: 60 })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+  it("should respond with a 400 status if the review ID is not valid", () => {
+    return request(app)
+      .patch("/api/reviews/notAnID")
+      .send({ inc_votes: 60 })
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Bad Request");
