@@ -5,6 +5,7 @@ const {
   fetchUsers,
   fetchReviews,
   fetchCommentsByReviewID,
+  insertCommentByReviewID,
 } = require("../models/categories.model");
 
 exports.getCategories = (req, res) => {
@@ -27,7 +28,7 @@ exports.patchReviewByID = (req, res, next) => {
   const incVotes = req.body.inc_votes;
   updateReviewByID(review_id, incVotes)
     .then((review) => {
-      res.send(review);
+      res.send({ review });
     })
     .catch(next);
 };
@@ -50,6 +51,18 @@ exports.getCommentsByReviewID = (req, res, next) => {
   fetchCommentsByReviewID(review_id)
     .then((comments) => {
       res.send({ comments });
+    })
+    .catch(next);
+};
+
+exports.postCommentByReviewID = (req, res, next) => {
+  const { review_id } = req.params;
+  const author = req.body.username;
+  const body = req.body.body;
+
+  insertCommentByReviewID(review_id, author, body)
+    .then((comment) => {
+      res.status(201).send({ comment });
     })
     .catch(next);
 };

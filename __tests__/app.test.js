@@ -70,7 +70,7 @@ describe("PATCH /api/reviews/:review_id", () => {
       .send({ inc_votes: 60 })
       .expect(200)
       .then((res) => {
-        expect(res.body).toEqual({
+        expect(res.body.review).toEqual({
           review_id: 3,
           title: "Ultimate Werewolf",
           designer: "Akihisa Okui",
@@ -212,6 +212,46 @@ describe("GET /api/reviews/:review_id/comments", () => {
   it("should respond with a 404 status if the review does not exist", () => {
     return request(app)
       .get("/api/reviews/1000/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not Found");
+      });
+  });
+});
+
+describe("POST /api/reviews/:review_id/comments", () => {
+  it("should respond with the added comment", () => {
+    return request(app)
+      .post("/api/reviews/3/comments")
+      .send({
+        username: "bainesface",
+        body: "Sad ending but I had loads of fun!",
+      })
+      .expect(201)
+      .then((res) => {
+        expect(res.body.comment).toEqual(
+          expect.objectContaining({
+            author: "bainesface",
+            body: "Sad ending but I had loads of fun!",
+            comment_id: expect.any(Number),
+            review_id: 3,
+            votes: 0,
+            created_at: expect.any(String),
+          })
+        );
+      });
+  });
+  it("should respond with a 400 status if the review ID is not valid", () => {
+    return request(app)
+      .post("/api/reviews/notAnID/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+  it("should respond with a 404 status if the review does not exist", () => {
+    return request(app)
+      .post("/api/reviews/1000/comments")
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("Not Found");

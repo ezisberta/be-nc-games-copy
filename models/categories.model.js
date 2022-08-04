@@ -57,8 +57,8 @@ exports.fetchReviews = () => {
     });
 };
 
-exports.fetchCommentsByReviewID = async (revID) => {
-  return (checkForReview = db
+exports.fetchCommentsByReviewID = (revID) => {
+  return db
     .query("SELECT * FROM reviews WHERE review_id=$1", [revID])
     .then(({ rows }) => {
       if (rows[0]) {
@@ -73,5 +73,27 @@ exports.fetchCommentsByReviewID = async (revID) => {
           msg: `No review found for review_id: ${revID}`,
         });
       }
-    }));
+    });
+};
+
+exports.insertCommentByReviewID = (revID, auth, body) => {
+  return db
+    .query("SELECT * FROM reviews WHERE review_id=$1", [revID])
+    .then(({ rows }) => {
+      if (rows[0]) {
+        return db
+          .query(
+            "INSERT INTO comments (review_id, author, body) VALUES ($1,$2,$3) RETURNING*",
+            [revID, auth, body]
+          )
+          .then(({ rows }) => {
+            return rows[0];
+          });
+      } else {
+        return Promise.reject({
+          status: 404,
+          msg: `No review found for review_id: ${revID}`,
+        });
+      }
+    });
 };
