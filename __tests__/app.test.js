@@ -138,21 +138,44 @@ describe("GET /api/reviews/:review_id (comment count)", () => {
       .get("/api/reviews/3")
       .expect(200)
       .then((res) => {
-        expect(res.body.review).toEqual(
-          expect.objectContaining({
-            review_id: 3,
-            title: "Ultimate Werewolf",
-            designer: "Akihisa Okui",
-            owner: "bainesface",
-            review_img_url:
-              "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
-            review_body: "We couldn't find the werewolf!",
-            category: "social deduction",
-            created_at: "2021-01-18T10:01:41.251Z",
-            votes: 5,
-            comment_count: "3",
-          })
-        );
+        expect(res.body.review.comment_count).toBe(3);
+      });
+  });
+});
+
+describe("GET /api/reviews", () => {
+  it("should respond with an array of review objects", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.reviews.length).not.toBe(0);
+        res.body.reviews.forEach((review) => {
+          expect(review).toEqual(
+            expect.objectContaining({
+              review_id: expect.any(Number),
+              title: expect.any(String),
+              designer: expect.any(String),
+              owner: expect.any(String),
+              review_img_url: expect.any(String),
+              review_body: expect.any(String),
+              category: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              comment_count: expect.any(Number),
+            })
+          );
+        });
+      });
+  });
+  it("should sort the reviews by date", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.reviews).toBeSortedBy("created_at", {
+          descending: true,
+        });
       });
   });
 });
