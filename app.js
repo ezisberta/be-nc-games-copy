@@ -5,6 +5,7 @@ const {
   getReviewByID,
   patchReviewByID,
   getUsers,
+  getReviews,
 } = require("./controllers/categories.controller");
 
 app.use(express.json());
@@ -16,6 +17,8 @@ app.get("/api/reviews/:review_id", getReviewByID);
 app.patch("/api/reviews/:review_id", patchReviewByID);
 
 app.get("/api/users", getUsers);
+
+app.get("/api/reviews", getReviews);
 
 app.use((err, req, res, next) => {
   if (err.code === "22P02" || err.code === "23502") {

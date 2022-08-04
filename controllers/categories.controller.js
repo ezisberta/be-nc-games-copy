@@ -3,6 +3,7 @@ const {
   fetchReviewByID,
   updateReviewByID,
   fetchUsers,
+  fetchReviews,
 } = require("../models/categories.model");
 
 exports.getCategories = (req, res) => {
@@ -13,10 +14,9 @@ exports.getCategories = (req, res) => {
 
 exports.getReviewByID = (req, res, next) => {
   const { review_id } = req.params;
-
   fetchReviewByID(review_id)
     .then((review) => {
-      res.send(review);
+      res.send({ review });
     })
     .catch(next);
 };
@@ -34,5 +34,11 @@ exports.patchReviewByID = (req, res, next) => {
 exports.getUsers = (req, res) => {
   fetchUsers().then((users) => {
     res.send({ users });
+  });
+};
+
+exports.getReviews = (req, res) => {
+  fetchReviews().then((reviews) => {
+    res.send({ reviews });
   });
 };
