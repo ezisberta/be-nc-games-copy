@@ -16,7 +16,7 @@ exports.getReviewByID = (req, res, next) => {
 
   fetchReviewByID(review_id)
     .then((review) => {
-      res.send(review);
+      res.send({ review });
     })
     .catch(next);
 };

@@ -29,18 +29,20 @@ describe("GET /api/reviews/:review_id", () => {
       .get("/api/reviews/3")
       .expect(200)
       .then((res) => {
-        expect(res.body).toEqual({
-          review_id: 3,
-          title: "Ultimate Werewolf",
-          designer: "Akihisa Okui",
-          owner: "bainesface",
-          review_img_url:
-            "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
-          review_body: "We couldn't find the werewolf!",
-          category: "social deduction",
-          created_at: "2021-01-18T10:01:41.251Z",
-          votes: 5,
-        });
+        expect(res.body.review).toEqual(
+          expect.objectContaining({
+            review_id: 3,
+            title: "Ultimate Werewolf",
+            designer: "Akihisa Okui",
+            owner: "bainesface",
+            review_img_url:
+              "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+            review_body: "We couldn't find the werewolf!",
+            category: "social deduction",
+            created_at: "2021-01-18T10:01:41.251Z",
+            votes: 5,
+          })
+        );
       });
   });
   it("should respond with a 400 status if the review ID is not valid", () => {
@@ -126,6 +128,31 @@ describe("GET /api/users", () => {
             })
           );
         });
+      });
+  });
+});
+
+describe("GET /api/reviews/:review_id (comment count)", () => {
+  it("should respond with a review object with a comment_count property", () => {
+    return request(app)
+      .get("/api/reviews/3")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.review).toEqual(
+          expect.objectContaining({
+            review_id: 3,
+            title: "Ultimate Werewolf",
+            designer: "Akihisa Okui",
+            owner: "bainesface",
+            review_img_url:
+              "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+            review_body: "We couldn't find the werewolf!",
+            category: "social deduction",
+            created_at: "2021-01-18T10:01:41.251Z",
+            votes: 5,
+            comment_count: "3",
+          })
+        );
       });
   });
 });
