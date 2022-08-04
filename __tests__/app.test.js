@@ -10,7 +10,7 @@ describe("GET /api/categories", () => {
       .get("/api/categories")
       .expect(200)
       .then((res) => {
-        expect(res.body.categories.length).not.toBe(0);
+        expect(res.body.categories.length).toBe(4);
         res.body.categories.forEach((category) => {
           expect(category).toEqual(
             expect.objectContaining({
@@ -118,7 +118,7 @@ describe("GET /api/users", () => {
       .get("/api/users")
       .expect(200)
       .then((res) => {
-        expect(res.body.users.length).not.toBe(0);
+        expect(res.body.users.length).toBe(4);
         res.body.users.forEach((user) => {
           expect(user).toEqual(
             expect.objectContaining({
@@ -149,7 +149,7 @@ describe("GET /api/reviews", () => {
       .get("/api/reviews")
       .expect(200)
       .then((res) => {
-        expect(res.body.reviews.length).not.toBe(0);
+        expect(res.body.reviews.length).toBe(13);
         res.body.reviews.forEach((review) => {
           expect(review).toEqual(
             expect.objectContaining({
@@ -176,6 +176,45 @@ describe("GET /api/reviews", () => {
         expect(res.body.reviews).toBeSortedBy("created_at", {
           descending: true,
         });
+      });
+  });
+});
+
+describe("GET /api/reviews/:review_id/comments", () => {
+  it("should respond with an array of comment objects for the given ID", () => {
+    return request(app)
+      .get("/api/reviews/3/comments")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.comments.length).not.toBe(0);
+        res.body.comments.forEach((review) => {
+          expect(review).toEqual(
+            expect.objectContaining({
+              comment_id: expect.any(Number),
+              votes: expect.any(Number),
+              created_at: expect.any(String),
+              author: expect.any(String),
+              body: expect.any(String),
+              review_id: 3,
+            })
+          );
+        });
+      });
+  });
+  it("should respond with a 400 status if the review ID is not valid", () => {
+    return request(app)
+      .get("/api/reviews/notAnID/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+  it("should respond with a 404 status if the review does not exist", () => {
+    return request(app)
+      .get("/api/reviews/1000/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not Found");
       });
   });
 });
