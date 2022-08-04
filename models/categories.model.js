@@ -1,5 +1,4 @@
 const db = require("../db/connection");
-const reviews = require("../db/data/test-data/reviews");
 
 exports.fetchCategories = () => {
   return db.query("SELECT * FROM categories;").then(({ rows }) => {
@@ -56,4 +55,23 @@ exports.fetchReviews = () => {
     .then(({ rows }) => {
       return rows;
     });
+};
+
+exports.fetchCommentsByReviewID = async (revID) => {
+  return (checkForReview = db
+    .query("SELECT * FROM reviews WHERE review_id=$1", [revID])
+    .then(({ rows }) => {
+      if (rows[0]) {
+        return db
+          .query("SELECT * FROM comments WHERE review_id=$1", [revID])
+          .then(({ rows }) => {
+            return rows;
+          });
+      } else {
+        return Promise.reject({
+          status: 404,
+          msg: `No review found for review_id: ${revID}`,
+        });
+      }
+    }));
 };
