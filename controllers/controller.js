@@ -7,7 +7,7 @@ const {
   fetchCommentsByReviewID,
   insertCommentByReviewID,
   deleteCommentByID,
-} = require("../models/categories.model");
+} = require("../models/model");
 
 const endpoints = require("../endpoints.json");
 

@@ -10,7 +10,7 @@ const {
   postCommentByReviewID,
   removeCommentByID,
   getApi,
-} = require("./controllers/categories.controller");
+} = require("./controllers/controller");
 
 app.use(express.json());
 
