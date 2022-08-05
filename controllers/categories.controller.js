@@ -6,8 +6,10 @@ const {
   fetchReviews,
   fetchCommentsByReviewID,
   insertCommentByReviewID,
-  fetchReviewsSortedBy,
+  deleteCommentByID,
 } = require("../models/categories.model");
+
+const endpoints = require("../endpoints.json");
 
 exports.getCategories = (req, res) => {
   fetchCategories().then((categories) => {
@@ -45,9 +47,7 @@ exports.getReviews = (req, res, next) => {
   const validOrderBy = [];
   const validCategory = [];
 
-  const where = req.query.hasOwnProperty("category")
-    ? `WHERE reviews.category='${req.query.category}' `
-    : "";
+  const where = "";
 
   const sortBy = req.query.sort_by || "created_at";
   const order = req.query.order || "DESC";
@@ -79,4 +79,17 @@ exports.postCommentByReviewID = (req, res, next) => {
       res.status(201).send({ comment });
     })
     .catch(next);
+};
+
+exports.removeCommentByID = (req, res, next) => {
+  const { comment_id } = req.params;
+  deleteCommentByID(comment_id)
+    .then(() => {
+      res.status(204).send({});
+    })
+    .catch(next);
+};
+
+exports.getApi = (req, res) => {
+  res.send({ endpoints });
 };
