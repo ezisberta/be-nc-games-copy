@@ -131,5 +131,3 @@ exports.deleteCommentByID = (comID) => {
       }
     });
 };
-
-exports.getApi = () => {};
