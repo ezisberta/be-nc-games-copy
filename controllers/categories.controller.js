@@ -6,6 +6,7 @@ const {
   fetchReviews,
   fetchCommentsByReviewID,
   insertCommentByReviewID,
+  fetchReviewsSortedBy,
 } = require("../models/categories.model");
 
 exports.getCategories = (req, res) => {
@@ -39,10 +40,23 @@ exports.getUsers = (req, res) => {
   });
 };
 
-exports.getReviews = (req, res) => {
-  fetchReviews().then((reviews) => {
-    res.send({ reviews });
-  });
+exports.getReviews = (req, res, next) => {
+  const validSortedBy = [];
+  const validOrderBy = [];
+  const validCategory = [];
+
+  const where = req.query.hasOwnProperty("category")
+    ? `WHERE reviews.category='${req.query.category}' `
+    : "";
+
+  const sortBy = req.query.sort_by || "created_at";
+  const order = req.query.order || "DESC";
+
+  fetchReviews(where, req.query.category, sortBy, order)
+    .then((reviews) => {
+      res.send({ reviews });
+    })
+    .catch(next);
 };
 
 exports.getCommentsByReviewID = (req, res, next) => {
