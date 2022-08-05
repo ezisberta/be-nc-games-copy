@@ -332,19 +332,17 @@ describe("GET /api/reviews (queries)", () => {
   });
   it("should also accept a category query with other queries", () => {
     return request(app)
-      .get("/api/reviews?category=social deduction&sort_by&order")
+      .get("/api/reviews?category=social deduction&sort_by=votes&order=ASC")
       .expect(200)
       .then((res) => {
         expect(res.body.reviews.length).toBe(11);
-        expect(res.body.reviews).toBeSortedBy("created_at", {
-          descending: true,
-        });
+        expect(res.body.reviews).toBeSortedBy("votes");
         res.body.reviews.forEach((review) => {
           expect(review.category).toBe("social deduction");
         });
       });
   });
-  it("should respond with a 400 status if the sort_by query is not valid", () => {
+  it("should respond with a 400 status if the sort_by query parameter is not valid", () => {
     return request(app)
       .get("/api/reviews?sort_by=invalid")
       .expect(400)
@@ -352,7 +350,7 @@ describe("GET /api/reviews (queries)", () => {
         expect(body.msg).toBe("Bad Request");
       });
   });
-  it("should respond with a 400 status if the order query is not valid", () => {
+  it("should respond with a 400 status if the order query parameter is not valid", () => {
     return request(app)
       .get("/api/reviews?order=INVALID")
       .expect(400)
@@ -360,7 +358,7 @@ describe("GET /api/reviews (queries)", () => {
         expect(body.msg).toBe("Bad Request");
       });
   });
-  it("should respond with a 400 status if the category query is not valid", () => {
+  it("should respond with a 400 status if the category query parameter is not valid", () => {
     return request(app)
       .get("/api/reviews?category=invalid")
       .expect(400)
@@ -370,6 +368,42 @@ describe("GET /api/reviews (queries)", () => {
         );
       });
   });
+  it("should ignore invalid queries and respond with the defaults", () => {
+    return request(app)
+      .get("/api/reviews?invalid=alsoInvalid")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.reviews.length).toBe(13);
+        expect(res.body.reviews).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
 });
 
-//    /api/reviews?sort_by=votes&order=ASC&category=dexterity
+describe("DELETE /api/comments/:comment_id", () => {
+  it("should delete the given comment by comment_id", () => {
+    return request(app)
+      .delete("/api/comments/3")
+      .expect(204)
+      .then((res) => {
+        expect(res.body).toEqual({});
+      });
+  });
+  it("should respond with a 404 status if the comment does not exist", () => {
+    return request(app)
+      .delete("/api/comments/1000")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("No comment found for comment_id: 1000");
+      });
+  });
+  it("should respond with a 404 status if the comment does not exist", () => {
+    return request(app)
+      .delete("/api/comments/notAnID")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+});

@@ -49,6 +49,7 @@ exports.fetchUsers = () => {
 
 exports.fetchReviews = (where, cat, sort, order) => {
   if (cat) {
+    where = `WHERE reviews.category='${cat}' `;
     return db
       .query("SELECT * FROM categories WHERE slug=$1", [cat])
       .then(({ rows }) => {
@@ -113,6 +114,21 @@ exports.insertCommentByReviewID = (revID, auth, body) => {
         return Promise.reject({
           status: 404,
           msg: `No review found for review_id: ${revID}`,
+        });
+      }
+    });
+};
+
+exports.deleteCommentByID = (comID) => {
+  return db
+    .query("DELETE FROM comments WHERE comment_id=$1 RETURNING *;", [comID])
+    .then(({ rows }) => {
+      if (rows[0]) {
+        return "DELETED";
+      } else {
+        return Promise.reject({
+          status: 404,
+          msg: `No comment found for comment_id: ${comID}`,
         });
       }
     });
