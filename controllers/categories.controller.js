@@ -9,6 +9,8 @@ const {
   deleteCommentByID,
 } = require("../models/categories.model");
 
+const endpoints = require("../endpoints.json");
+
 exports.getCategories = (req, res) => {
   fetchCategories().then((categories) => {
     res.send({ categories });
@@ -82,10 +84,12 @@ exports.postCommentByReviewID = (req, res, next) => {
 exports.removeCommentByID = (req, res, next) => {
   const { comment_id } = req.params;
   deleteCommentByID(comment_id)
-    .then((outcome) => {
-      if (outcome === "DELETED") {
-        res.status(204).send({});
-      }
+    .then(() => {
+      res.status(204).send({});
     })
     .catch(next);
+};
+
+exports.getApi = (req, res) => {
+  res.send({ endpoints });
 };

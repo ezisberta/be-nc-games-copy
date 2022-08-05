@@ -2,6 +2,7 @@ const app = require("../app");
 const request = require("supertest");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data");
+const endpoints = require("../endpoints.json");
 beforeEach(() => seed(testData));
 
 describe("GET /api/categories", () => {
@@ -383,27 +384,34 @@ describe("GET /api/reviews (queries)", () => {
 
 describe("DELETE /api/comments/:comment_id", () => {
   it("should delete the given comment by comment_id", () => {
-    return request(app)
-      .delete("/api/comments/3")
-      .expect(204)
-      .then((res) => {
-        expect(res.body).toEqual({});
-      });
+    return request(app).delete("/api/comments/3").expect(204);
   });
   it("should respond with a 404 status if the comment does not exist", () => {
     return request(app)
       .delete("/api/comments/1000")
       .expect(404)
-      .then(({ body }) => {
-        expect(body.msg).toBe("No comment found for comment_id: 1000");
+      .then((res) => {
+        expect(res.body.msg).toBe("No comment found for comment_id: 1000");
       });
   });
-  it("should respond with a 404 status if the comment does not exist", () => {
+  it("should respond with a 400 status if the comment ID is not valid", () => {
     return request(app)
       .delete("/api/comments/notAnID")
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Bad Request");
+      });
+  });
+});
+
+describe("GET /api", () => {
+  it("should respond with a json representation of all the available endpoints of the api", () => {
+    const endpointsCopy = { ...endpoints };
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.endpoints).toEqual(endpointsCopy);
       });
   });
 });
