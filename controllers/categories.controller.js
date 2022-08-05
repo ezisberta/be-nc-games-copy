@@ -5,6 +5,8 @@ const {
   fetchUsers,
   fetchReviews,
   fetchCommentsByReviewID,
+  insertCommentByReviewID,
+  fetchReviewsSortedBy,
 } = require("../models/categories.model");
 
 exports.getCategories = (req, res) => {
@@ -27,7 +29,7 @@ exports.patchReviewByID = (req, res, next) => {
   const incVotes = req.body.inc_votes;
   updateReviewByID(review_id, incVotes)
     .then((review) => {
-      res.send(review);
+      res.send({ review });
     })
     .catch(next);
 };
@@ -38,10 +40,23 @@ exports.getUsers = (req, res) => {
   });
 };
 
-exports.getReviews = (req, res) => {
-  fetchReviews().then((reviews) => {
-    res.send({ reviews });
-  });
+exports.getReviews = (req, res, next) => {
+  const validSortedBy = [];
+  const validOrderBy = [];
+  const validCategory = [];
+
+  const where = req.query.hasOwnProperty("category")
+    ? `WHERE reviews.category='${req.query.category}' `
+    : "";
+
+  const sortBy = req.query.sort_by || "created_at";
+  const order = req.query.order || "DESC";
+
+  fetchReviews(where, req.query.category, sortBy, order)
+    .then((reviews) => {
+      res.send({ reviews });
+    })
+    .catch(next);
 };
 
 exports.getCommentsByReviewID = (req, res, next) => {
@@ -50,6 +65,18 @@ exports.getCommentsByReviewID = (req, res, next) => {
   fetchCommentsByReviewID(review_id)
     .then((comments) => {
       res.send({ comments });
+    })
+    .catch(next);
+};
+
+exports.postCommentByReviewID = (req, res, next) => {
+  const { review_id } = req.params;
+  const author = req.body.username;
+  const body = req.body.body;
+
+  insertCommentByReviewID(review_id, author, body)
+    .then((comment) => {
+      res.status(201).send({ comment });
     })
     .catch(next);
 };
